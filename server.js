@@ -35,6 +35,10 @@ socketIoController.sendMessageAdmin(io);
 //     return res.render("404.ejs"); 
 // });
 
+process.on('unhandledRejection', (err) => {
+    console.error('[DB Error]', err.code || err.message);
+});
+
 server.listen(port, () => {
     console.log("Connected success port: " + port);
 });

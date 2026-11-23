@@ -142,11 +142,14 @@ function multiPredict(history){
 }
 
 // ── Global prediction state ────────────────────────────────────────
-var _history    = [];
-var _prediction = null;
-var _lastPeriod = null;
-var _busy       = false;
-var _retryCount = 0;
+var _history       = [];
+var _prediction    = null;
+var _lastPeriod    = null;
+var _busy          = false;
+var _retryCount    = 0;
+var _pendingPred   = null;   // prediction stored before next period reveals result
+var _prevHistLen   = 0;      // history length last time we settled
+var _accuracy      = {total:0,top1:0,color:0,size:0};
 
 // ── Auto-bet config (persisted in localStorage) ───────────────────
 var AB = {
@@ -525,15 +528,110 @@ function highlightTarget(pred){
   _prevHighlight=btn;
 }
 
+// ── Accuracy UI injector ───────────────────────────────────────────
+function injectAccuracyUI(){
+  var panel=eid('ai-predict-panel');
+  if(!panel||eid('ai-accuracy-wrap'))return;
+  var wrap=document.createElement('div');
+  wrap.id='ai-accuracy-wrap';
+  wrap.style.cssText='margin-top:10px;padding-top:10px;border-top:1px solid #1e2d40';
+  wrap.innerHTML=
+    // Last match row
+    '<div id="ai-last-match" style="display:none;margin-bottom:8px;background:#0a1628;border-radius:8px;padding:7px 10px">'+
+      '<div style="font-size:10px;color:#8899aa;margin-bottom:5px;letter-spacing:.4px">LAST PERIOD RESULT</div>'+
+      '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap" id="ai-match-badges"></div>'+
+    '</div>'+
+    // Running accuracy
+    '<div style="font-size:10px;color:#8899aa;margin-bottom:6px;letter-spacing:.4px">LIVE ACCURACY (<span id="ai-acc-total">0</span> rounds)</div>'+
+    '<div style="display:flex;gap:8px">'+
+      '<div style="flex:1;text-align:center;background:#0a1628;border-radius:8px;padding:6px 4px">'+
+        '<div id="ai-acc-top1" style="font-size:18px;font-weight:800;color:#f5c518">—</div>'+
+        '<div style="font-size:9px;color:#8899aa;margin-top:1px">Top1 №</div>'+
+      '</div>'+
+      '<div style="flex:1;text-align:center;background:#0a1628;border-radius:8px;padding:6px 4px">'+
+        '<div id="ai-acc-color" style="font-size:18px;font-weight:800;color:#388bfd">—</div>'+
+        '<div style="font-size:9px;color:#8899aa;margin-top:1px">Color</div>'+
+      '</div>'+
+      '<div style="flex:1;text-align:center;background:#0a1628;border-radius:8px;padding:6px 4px">'+
+        '<div id="ai-acc-size" style="font-size:18px;font-weight:800;color:#a371f7">—</div>'+
+        '<div style="font-size:9px;color:#8899aa;margin-top:1px">Size</div>'+
+      '</div>'+
+    '</div>';
+  // Insert before auto-bet UI (or just append)
+  var ab=eid('wp-autobet-ui');
+  if(ab)panel.insertBefore(wrap,ab);
+  else panel.appendChild(wrap);
+}
+
+// ── Settle pending prediction against actual result ────────────────
+function settleAccuracy(pred,actual){
+  if(!pred)return;
+  var actualColor=COLOR_MAP[actual],actualSize=SIZE_MAP[actual];
+  var matchTop1   = pred.top1.num===actual;
+  var matchColor  = pred.color.winner===actualColor||
+                    (actualColor==='red-violet'&&pred.color.winner==='red')||
+                    (actualColor==='green-violet'&&pred.color.winner==='green');
+  var matchSize   = pred.size.winner===actualSize;
+  _accuracy.total++;
+  if(matchTop1) _accuracy.top1++;
+  if(matchColor)_accuracy.color++;
+  if(matchSize) _accuracy.size++;
+
+  // Render last-match row
+  var lm=eid('ai-last-match');
+  if(lm){
+    lm.style.display='block';
+    var badges=eid('ai-match-badges');
+    if(badges){
+      var actualCss=COLOR_CSS[actualColor]||'#888';
+      function badge(label,ok){
+        return '<span style="display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:12px;font-size:10px;font-weight:700;'+
+               'background:'+(ok?'rgba(63,185,80,.15)':'rgba(233,69,96,.15)')+';'+
+               'border:1px solid '+(ok?'#3fb950':'#e94560')+';color:'+(ok?'#3fb950':'#e94560')+'">'+
+               (ok?'✓ ':'✗ ')+label+'</span>';
+      }
+      badges.innerHTML=
+        '<div style="width:28px;height:28px;border-radius:50%;background:'+actualCss+
+          ';display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0">'+actual+'</div>'+
+        badge('Top1 '+pred.top1.num+'→'+actual, matchTop1)+
+        badge(pred.color.winner+'→'+actualColor.replace('-',' '), matchColor)+
+        badge(pred.size.winner+'→'+actualSize, matchSize);
+    }
+  }
+
+  // Update accuracy numbers
+  var pct=function(n,d){return d?Math.round(n/d*100)+'%':'—';};
+  var t1pct =pct(_accuracy.top1, _accuracy.total);
+  var colpct=pct(_accuracy.color,_accuracy.total);
+  var szpct =pct(_accuracy.size, _accuracy.total);
+  setText('ai-acc-total',_accuracy.total);
+  var t1el=eid('ai-acc-top1');
+  if(t1el){t1el.textContent=t1pct;t1el.style.color=_accuracy.total&&(_accuracy.top1/_accuracy.total)>=.5?'#3fb950':'#f5c518';}
+  var coel=eid('ai-acc-color');
+  if(coel){coel.textContent=colpct;coel.style.color=_accuracy.total&&(_accuracy.color/_accuracy.total)>=.5?'#3fb950':'#388bfd';}
+  var szel=eid('ai-acc-size');
+  if(szel){szel.textContent=szpct;szel.style.color=_accuracy.total&&(_accuracy.size/_accuracy.total)>=.5?'#3fb950':'#a371f7';}
+}
+
 // ── Main refresh ───────────────────────────────────────────────────
 function run(){
   if(_busy)return;_busy=true;setText('ai-status','Analysing…');
+  // Snapshot current prediction — will settle it after new result arrives
+  var predSnapshot=_prediction;
+  var prevLen=_prevHistLen;
   fetchHistory(function(history){
     _busy=false;
     if(!history||history.length<5){setText('ai-status','Waiting for data…');return;}
+    // If history grew (new period result came in) and we had a prediction, settle it
+    if(predSnapshot&&history.length>prevLen){
+      var actual=history[history.length-1];
+      settleAccuracy(predSnapshot,actual);
+    }
+    _prevHistLen=history.length;
     var result=multiPredict(history);
     _prediction=result;
     renderPredict(result,history.length);
+    injectAccuracyUI();
     injectAutoBetUI();
     // Auto-bet: place after a short delay so popup system is ready
     if(AB.enabled){

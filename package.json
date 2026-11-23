@@ -1,0 +1,25 @@
+{
+  "name": "wingo-source-code",
+  "version": "1.0.0",
+  "description": "Wingo lottery game with Smart AI prediction and auto-bet",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "md5": "^2.3.0",
+    "mysql2": "^3.3.3",
+    "node-cron": "^3.0.2",
+    "request": "^2.88.2",
+    "socket.io": "^4.6.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}

@@ -58,6 +58,60 @@
       </div>
       <!---------->
       <%- include('element/info.ejs') -%>
+      <!-- ── SMART AI PREDICTION PANEL ───────────────────────── -->
+      <div id="ai-predict-panel" style="
+        margin:8px 10px;border-radius:12px;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);
+        border:1px solid #e94560;padding:12px;color:#fff;font-family:sans-serif;box-shadow:0 4px 20px rgba(233,69,96,.3)
+      ">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span style="font-size:13px;font-weight:700;color:#e94560;letter-spacing:1px">🤖 SMART AI v3.0</span>
+          <span id="ai-status" style="font-size:10px;color:#aaa;background:#0f3460;padding:2px 8px;border-radius:10px">Analysing...</span>
+        </div>
+
+        <!-- Primary prediction -->
+        <div style="display:flex;gap:10px;align-items:stretch;margin-bottom:10px">
+          <!-- Top1 number -->
+          <div style="flex:0 0 70px;text-align:center">
+            <div id="ai-top1-num" style="
+              width:60px;height:60px;border-radius:50%;background:#e94560;margin:0 auto 4px;
+              display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;
+              box-shadow:0 0 16px rgba(233,69,96,.6)
+            ">?</div>
+            <div id="ai-top1-color" style="font-size:10px;color:#ccc;text-transform:uppercase">—</div>
+          </div>
+          <!-- Right details -->
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center">
+            <div style="display:flex;justify-content:space-between;font-size:12px">
+              <span style="color:#aaa">Size</span>
+              <span id="ai-size-pred" style="font-weight:700;color:#f5c518">—</span>
+              <span id="ai-size-conf" style="color:#aaa;font-size:10px"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px">
+              <span style="color:#aaa">Color</span>
+              <span id="ai-color-pred" style="font-weight:700">—</span>
+              <span id="ai-color-conf" style="color:#aaa;font-size:10px"></span>
+            </div>
+            <!-- Confidence bar -->
+            <div>
+              <div style="font-size:10px;color:#aaa;margin-bottom:2px">Confidence</div>
+              <div style="background:#0f3460;border-radius:4px;height:8px;overflow:hidden">
+                <div id="ai-conf-bar" style="height:100%;background:linear-gradient(90deg,#e94560,#f5c518);width:0%;transition:width .5s"></div>
+              </div>
+              <div id="ai-conf-pct" style="font-size:11px;text-align:right;margin-top:2px;color:#f5c518">0%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top 3 lucky numbers -->
+        <div style="margin-bottom:8px">
+          <div style="font-size:10px;color:#aaa;margin-bottom:6px;letter-spacing:.5px">🎯 TOP 3 LUCKY NUMBERS</div>
+          <div style="display:flex;gap:8px;justify-content:center" id="ai-top3"></div>
+        </div>
+
+        <!-- Signal weights -->
+        <div id="ai-signals" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center"></div>
+      </div>
+      <!-- ───────────────────────────────────────────────────── -->
       <!---------->
       <div data-v-a9660e98="" class="game-betting">
         <div data-v-a9660e98="" class="tab">
@@ -183,6 +237,7 @@
   <script src="/js/client.js"></script>
   <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
   <script src="/js/wingo1.js"></script>
+  <script src="/js/wingoPredict.js"></script>
 </body>
 
 </html>

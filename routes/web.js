@@ -8,6 +8,7 @@ import adminController from '../controllers/adminController';
 import dailyController from '../controllers/dailyController';
 import k5Controller from '../controllers/k5Controller';
 import k3Controller from '../controllers/k3Controller';
+import predictController from '../controllers/predictController';
 let router = express.Router();
 
 const initWebRouter = (app) => {
@@ -87,6 +88,10 @@ const initWebRouter = (app) => {
     router.post('/api/webapi/action/join', middlewareController, winGoController.betWinGo); // register
     router.post('/api/webapi/GetNoaverageEmerdList', middlewareController, winGoController.listOrderOld); // register
     router.post('/api/webapi/GetMyEmerdList', middlewareController, winGoController.GetMyEmerdList); // register
+
+    // AI Prediction engine
+    router.post('/api/webapi/predict', middlewareController, predictController.getPrediction);
+    router.post('/api/webapi/predict/multi', middlewareController, predictController.getMultiModePrediction);
 
     // promotion
     router.post('/api/webapi/promotion', middlewareController, userController.promotion); // register

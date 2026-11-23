@@ -1,6 +1,6 @@
 import e from "express";
-import connection from "../config/connectDB";
-require('dotenv').config();
+import connection from "../config/connectDB.js";
+import dotenv from 'dotenv'; dotenv.config();
 
 
 const K5DPage = async (req, res) => {

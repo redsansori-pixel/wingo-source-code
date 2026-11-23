@@ -1,4 +1,4 @@
-import connection from "../config/connectDB";
+import connection from "../config/connectDB.js";
 
 // ─── Color / Size mappings ───────────────────────────────────────────────────
 const COLOR_MAP = {

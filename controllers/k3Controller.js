@@ -1,5 +1,5 @@
-import connection from "../config/connectDB";
-require('dotenv').config();
+import connection from "../config/connectDB.js";
+import dotenv from 'dotenv'; dotenv.config();
 
 const K3Page = async (req, res) => {
     return res.render("bet/k3/k3.ejs");

@@ -1,9 +1,9 @@
-import connection from "../config/connectDB";
+import connection from "../config/connectDB.js";
 import jwt from 'jsonwebtoken'
 import md5 from "md5";
 import request from 'request';
 import e from "express";
-require('dotenv').config();
+import dotenv from 'dotenv'; dotenv.config();
 
 let timeNow = Date.now();
 

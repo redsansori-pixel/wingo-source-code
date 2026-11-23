@@ -132,7 +132,7 @@ const myProfilePage = async(req, res) => {
     return res.render("member/myProfile.ejs"); 
 }
 
-module.exports = {
+export default {
     homePage,
     checkInPage,
     promotionPage,

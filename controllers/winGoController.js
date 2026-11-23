@@ -584,7 +584,7 @@ const handlingWinGo1P = async (typeid) => {
     }
 }
 
-module.exports = {
+export default {
     winGoPage,
     betWinGo,
     listOrderOld,

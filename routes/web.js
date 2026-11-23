@@ -209,6 +209,6 @@ const initWebRouter = (app) => {
     return app.use('/', router); 
 }
 
-module.exports = {
+export default {
     initWebRouter,
 };

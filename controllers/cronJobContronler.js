@@ -89,6 +89,6 @@ const cronJobGame1p = (io) => {
     });
 }
 
-module.exports = {
+export default {
     cronJobGame1p
 };

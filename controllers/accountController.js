@@ -323,7 +323,7 @@ const forGotPassword = async(req, res) => {
 
 
 
-module.exports = {
+export default {
     login,
     register,
     loginPage,

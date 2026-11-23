@@ -1110,7 +1110,7 @@ const GetMyEmerdList = async (req, res) => {
 }
 
 
-module.exports = {
+export default {
     K3Page,
     betK3,
     addK3,

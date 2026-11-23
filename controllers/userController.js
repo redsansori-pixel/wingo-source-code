@@ -1209,7 +1209,7 @@ const callback_bank = async(req, res) => {
 
 
 
-module.exports = {
+export default {
     userInfo,
     changeUser,
     promotion, 

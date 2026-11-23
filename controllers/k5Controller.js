@@ -576,7 +576,7 @@ const handling5D = async(typeid) => {
 }
 
 
-module.exports = {
+export default {
     K5DPage,
     K5DPage3,
     K5DPage5,

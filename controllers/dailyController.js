@@ -1245,7 +1245,7 @@ const buffMoney = async(req, res) => {
     }
 }
   
-module.exports = {
+export default {
     buffMoney,
     dailyPage,
     middlewareDailyController,

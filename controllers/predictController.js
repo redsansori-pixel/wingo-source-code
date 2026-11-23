@@ -357,7 +357,7 @@ const getMultiModePrediction = async (req, res) => {
     });
 };
 
-module.exports = {
+export default {
     getPrediction,
     getMultiModePrediction
 };
